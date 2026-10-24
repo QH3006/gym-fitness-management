@@ -1,0 +1,13 @@
+# Environment variables
+.env
+
+# Docker volumes and local runtime files
+*.log
+/loki/data/
+/grafana/data/
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
