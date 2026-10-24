@@ -1,0 +1,57 @@
+# ====================================================================
+# PROMETHEUS ALERTING RULES - HỆ THỐNG GYM & FITNESS (ĐỀ 23)
+# Dựa trên hướng dẫn Lab 8 (Trang 19, 20)
+# ====================================================================
+
+groups:
+  - name: gym-fitness-alerts
+    rules:
+      # 1. Cảnh báo CPU Web App Gym vượt ngưỡng 80%
+      - alert: GymWebHighCPU
+        expr: rate(container_cpu_usage_seconds_total{container="gym-web"}[5m]) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Cảnh báo tải CPU ứng dụng Gym Web cao"
+          description: "Mức sử dụng CPU của container gym-web vượt quá 80% liên tục trong 2 phút."
+
+      # 2. Cảnh báo RAM Web App Gym vượt ngưỡng 85%
+      - alert: GymWebHighMemory
+        expr: (container_memory_usage_bytes{container="gym-web"} / container_spec_memory_limit_bytes{container="gym-web"}) * 100 > 85
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Bộ nhớ RAM container gym-web sắp cạn kiệt"
+          description: "Mức tiêu thụ RAM của gym-web vượt quá 85% dung lượng phân bổ."
+
+      # 3. Cảnh báo số lượng kết nối tới MySQL quá tải (> 80 kết nối)
+      - alert: MySQLTooManyConnections
+        expr: mysql_global_status_threads_connected > 80
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Cơ sở dữ liệu MySQL có quá nhiều kết nối đồng thời"
+          description: "Số lượng kết nối MySQL hiện tại đạt ngưỡng trên 80 sessions."
+
+      # 4. Cảnh báo tỷ lệ lỗi truy vấn MySQL bất thường
+      - alert: MySQLErrorRateHigh
+        expr: rate(mysql_global_status_errors_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Tỷ lệ lỗi truy vấn MySQL cao bất thường"
+          description: "Phát hiện nhiều lỗi truy vấn SQL xảy ra trên database gym_db."
+
+      # 5. Cảnh báo dung lượng ổ đĩa máy chủ sắp hết (< 15%)
+      - alert: HighDiskUsage
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 15
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Dung lượng ổ cứng máy chủ dưới 15%"
+          description: "Dung lượng ổ cứng trống của máy chủ còn lại dưới mức an toàn 15%."

@@ -1,0 +1,41 @@
+# ====================================================================
+# PROMETHEUS CONFIGURATION - HỆ THỐNG QUẢN LÝ PHÒNG GYM (ĐỀ 23)
+# Cấu hình Scrape Targets & Tích hợp Alertmanager theo đúng chuẩn Lab
+# ====================================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Cấu hình Alertmanager nhận thông báo cảnh báo (Lab 8 - Bước 33)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager:9093'
+
+# Tải các tệp luật cảnh báo (Lab 8 - Bước 34)
+rule_files:
+  - '/etc/prometheus/rules/*.yml'
+
+# Khai báo các Job thu thập metrics (Lab 7 - Bước 4)
+scrape_configs:
+  # 1. Tự giám sát Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']
+
+  # 2. Giám sát hệ điều hành máy chủ (Node Exporter)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # 3. Giám sát tài nguyên các Container Docker (cAdvisor)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  # 4. Giám sát cơ sở dữ liệu MySQL (MySQL Exporter)
+  - job_name: 'mysql'
+    static_configs:
+      - targets: ['mysql-exporter:9104']
